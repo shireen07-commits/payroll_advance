@@ -1,0 +1,75 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: advance-request-service
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payroll_advance_requests
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: advance-request-service-group
+      auto-offset-reset: earliest
+    producer:
+      client-id: advance-request-service-producer
+  
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  health:
+    probes:
+      enabled: true
+
+# Application-specific settings
+app:
+  # Advance request settings
+  advance:
+    max-percent-salary: 50.0  # Maximum percentage of salary that can be requested
+    min-amount: 50.0         # Minimum amount that can be requested
+    max-amount: 5000.0       # Maximum amount that can be requested
+    fee-percentage: 2.0      # Fee percentage for each advance request
+  
+  # Integration with Salary Ledger Service
+  salary-ledger:
+    service-name: salary-ledger-service
+    api-path: /api/v1/ledger
+  
+  # Integration with Approval Workflow Service
+  approval-workflow:
+    service-name: approval-workflow-service
+    api-path: /api/v1/workflows
+  
+  # Kafka topics to listen to and publish events
+  kafka:
+    topics:
+      advance-request-created: advance-request-created
+      advance-request-updated: advance-request-updated
+      advance-request-approved: advance-request-approved
+      advance-request-rejected: advance-request-rejected
+      user-created: user-created
+      employee-profile-created: employee-profile-created
+      notification-requested: notification-requested
